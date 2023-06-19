@@ -1,0 +1,8 @@
+location,weather,companion,expensive,holiday
+nice,sunny,annoying,Y,good
+nice,sunny,annoying,N,bad
+boring,rainy,great,Y,good
+boring,sunny,great,Y,bad
+nice,rainy,great,Y,good
+boring,rainy,annoying,N,good
+boring,rainy,great,N,good

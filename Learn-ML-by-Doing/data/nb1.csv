@@ -1,0 +1,11 @@
+home owner,marital status,income,loan default
+yes,single,very high,yes
+no,married,high,yes
+no,single,medium,no
+yes,married,very high,no
+yes,divorced,high,yes
+no,married,low,no
+yes,divorced,very high,no
+no,single,high,yes
+no,married,medium,no
+no,single,low,yes
