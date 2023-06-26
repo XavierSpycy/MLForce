@@ -17,7 +17,7 @@ In future updates, we will strive to enhance the efficiency of various algorithm
 因此我们并未追求具体的算法部分的最优实现。
 在今后的更新中, 我们将会力求完善不同算法的效率, 并满足用户的多种需求。"""
 
-from typing import Union, Literal
+from typing import Union
 import numpy as np
 import pandas as pd
 from scipy.stats import norm, pearsonr
