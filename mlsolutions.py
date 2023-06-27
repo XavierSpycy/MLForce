@@ -245,20 +245,54 @@ class KNearestNeighbor(object):
     
     """Example/示例:
         >>> knn = KNearestNeighbor(k=1)
-        >>> knn.fit(X, y) 
+        >>> knn.fit(X, y)
         >>> prediction = knn.predict(new_example)
         >>> print(knn)
     """
 
-    def __init__(self, k):
+    def __init__(self, k: int) -> None:
+        """
+            Initialize the object KNearestNeighbor
+        """
+        """
+            初始化对象KNearestNeighbor
+        """
+        
+        '''Parameter:
+            k, corresponds to the value of k in k-Nearest Neighbors.
+        '''
+        '''参数:
+            k, 对应k最近邻中的k值。
+        '''
+
+        # Check the data type of the inputs / 检查输入的数据类型
         if not isinstance(k, int):
             raise TypeError("The k of K-Nearest Neighbor must be an integer.")
+        # Verify the validity of the value of k in k-Nearest Neighbor / 验证k最近邻中k值的有效性
         if k < 1:
             raise ValueError("The k of K-Nearest Neighbor must be larger than 1.")
         self.k = k
         
-    def fit(self, X_train, y_train):
+    def fit(self, X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
+        """
+            Fit the model to the training data
+        """
+        """
+            使模型拟合训练数据
+        """
+        
+        '''Parameters:
+            X_train, corresponds to the training inputs;
+            y_train, corresponds to the training labels.
+        '''
+        '''参数:
+            X_train, 对应训练输入;
+            y_train, 对应训练标签。
+        '''
+        
+        # Detect the data type of attributes, including 'numeric' and 'nominal'
         self.feature_type = None
+        # Reject the unexpected inputs / 拒绝意外输入
         if not isinstance(X_train, pd.DataFrame):
             raise TypeError("Inputs must be a pandas DataFrame.")
         if not isinstance(y_train, pd.Series):
@@ -287,7 +321,24 @@ class KNearestNeighbor(object):
         self.train_inputs = X_train.to_numpy()
         self.train_labels = y_train
     
-    def predict(self, X_test):
+    def predict(self, X_test: pd.DataFrame) -> pd.Series:
+        """
+            Predict labels for the test inputs
+        """
+        """
+            为测试输入预测标签
+        """
+
+        '''Parameter:
+            X_test, corresponds to the test inputs.
+        '''
+        '''参数:
+            X_test, 对应测试输入。
+        '''
+        
+        # Reject the unexpected inputs / 拒绝意外输入
+        if not isinstance(X_test, pd.DataFrame):
+            raise TypeError("Inputs must be a pandas DataFrame.")
         test_features = set(X_test.columns.tolist())
         if test_features != self.features:
             raise ValueError("Training and test features must match.")
@@ -296,14 +347,24 @@ class KNearestNeighbor(object):
         self.evidences = []
         if self.feature_type == 'numeric':
             for index, data in X_test.iterrows():
+                # Compute the Euclidean distance(also called L2 norm) using broadcasting mechanism
+                # 用广播机制计算欧几里得距离(也被称为L2范数)
                 distance = np.sqrt(np.sum(np.power(self.train_inputs - data.to_numpy(), 2), axis=1))
+                # Retrieve the indices the top-k closest example(s) to a given new example (with no guarantee of being sorted in order)
+                # 取回前k个距离给定的新样例最近的样例的切片(不确保按顺序排序)
                 indices = np.argpartition(distance, self.k)[:self.k]
+                # Sort / 排序
                 sorted_indices = indices[np.argsort(distance[indices])]
                 self.predictions.append(self.train_labels[sorted_indices].value_counts().idxmax())
                 self.evidences.append(self.train_examples[sorted_indices].tolist())
         elif self.feature_type == 'nominal':
             for index, data in X_test.iterrows():
-                distance = np.sqrt(np.sum(self.train_inputs == data.to_numpy(), axis=1))
+                # Compute the distance for nominal attributes (also using broadcasting mechanism) / 为分类属性计算距离(同样适用广播机制)
+                # In our implementation, we define the distance for nominal attributes as follows / 在我们的实现中, 我们定义分类属性的距离如下: 
+                # Distance = 0 if attribute values are the same / 距离 = 0, 若属性值相同;
+                # Distance = 1 if attribute values are not the same / 距离 = 1, 若属性值不同.
+                distance = np.sqrt(np.sum(self.train_inputs != data.to_numpy(), axis=1))
+                # The same operations with numeric attributes / 与数值属性相同的操作
                 indices = np.argpartition(distance, self.k)[:self.k]
                 sorted_indices = indices[np.argsort(distance[indices])]
                 self.predictions.append(self.train_labels[sorted_indices].value_counts().idxmax())
@@ -318,9 +379,10 @@ class KNearestNeighbor(object):
             定义字符串表示形式
         """
         
+        # Distinguish a subtle variation when "k" is singular or plural / 区别当k为单数或复数时细微的不同
         if self.k == 1:
             string_evidence = ["The closest nearest neighbor is ex." + ", ".join(map(str, evidence)) for evidence in self.evidences]
-            string_prediction = [f"Hence, {self.k}-Nearest Neighbor predicts {self.category} = {prediction}" for prediction in self.predictions]
+            string_prediction = [f"Hence, {self.k}-Nearest Neighbor predicts {self.category} = {prediction}." for prediction in self.predictions]
         else:
             string_evidence = ["The closest nearest neighbors are ex." + ", ".join(map(str, evidence)) for evidence in self.evidences]
             string_prediction = [f"The majority of {self.category} is {prediction}; hence, {self.k}-Nearest Neighbor predicts {self.category} = {prediction}." for prediction in self.predictions]
@@ -477,6 +539,7 @@ class OneRule(object):
         """
             定义字符串表示形式
         """
+
         rule_result = ""
         prediction_result = ""
         if self.generated_rule is not None:
@@ -494,6 +557,7 @@ class PRISM(object):
     """
         实现PRISM, 一种基于规则的覆盖算法
     """
+
     def best_condition(self, inputs, labels):
         best_correct = 0
         best_accuracy = 0.0
@@ -542,7 +606,7 @@ class PRISM(object):
             inputs = inputs[~combined_conditions]
             labels = labels[~combined_conditions]
     
-    def fit(self, X, y):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame):
         """
             Fit the model to the data
         """
@@ -559,7 +623,10 @@ class PRISM(object):
             y, 对应训练标签。
         '''
 
-        # Since we might have to generate rules for different class.
+        # Since we might have to generate rules for different class,
+        # we need to record the original data.
+        # 由于我们可能想要为不同的类别生成规则,
+        # 我们需要记录原始数据。
         self.original_inputs = X
         self.original_labels = y
         self.labelname = y.name
@@ -650,7 +717,9 @@ class NaiveBayes(object):
         return "\n".join(string_ouputs)
         
 class DecisionTreeRootSelection(object):
-    """"""
+    """
+        Implement 
+    """
     """"""
     def entropy(self, mylist):
         """
@@ -699,7 +768,9 @@ class DecisionTreeRootSelection(object):
             counts.append(num_category)
         return total_num, counts
 
-    def fit(self, X, y):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame) -> None:
+
+        # Reject the unexpected inputs / 拒绝意外输入
         if not isinstance(X, pd.DataFrame):
             raise TypeError("Inputs must be a pandas DataFrame.")
         if not isinstance(y, pd.Series):
@@ -740,10 +811,18 @@ class DecisionTreeRootSelection(object):
 
 class Perceptron(object):
     """
+        Implement Perceptron
     """
     """
+        实现感知机
     """
-    def __init__(self, n_in, default=True):
+
+    def __init__(self, n_in, default=True) -> None:
+        """
+            Initialize the object Perceptron
+        """
+        """
+        """
         self.n_in = n_in
         if default:
             self.weights = np.zeros(n_in)
@@ -761,8 +840,12 @@ class Perceptron(object):
         self.bias = bias
         
     def step(self, x):
-        """Define the step function"""
-        """定义阶梯函数"""
+        """
+            Define the step function
+        """
+        """
+            定义阶梯函数
+        """
 
         '''Parameter:
             x, corresponds to 
@@ -794,20 +877,44 @@ class Perceptron(object):
         """
             定义字符串表示形式
         """
+
         ep = self.epochs
         w = self.weights.tolist()
         b = self.bias
         return f"After {ep} epoch(s), weight vector and bias: w = {w}, b = {b}."
     
 class Kmeans(object):
-    def __init__(self, centroids):
+    """
+        Implement Kmeans
+    """
+    """
+        实现Kmeans
+    """
+
+    def __init__(self, centroids: list) -> None:
+        """
+            Initialize the object Kmeans
+        """
+        """
+            初始化对象Kmeans
+        """
+        """Parameter:
+            centroids, 
+        """
+
         self.centroids = centroids
         self.k = len(centroids)
         self.clusters = {}
         for i in range(self.k):
             self.clusters[i] = []
         
-    def fit(self, matrix):
+    def fit(self, matrix: pd.DataFrame) -> None:
+        '''Parameter:
+            matrix, correponds to the distance matrix.
+        '''
+        '''参数:
+            matrix, 对应距离矩阵。
+        '''
         if not isinstance(matrix, pd.DataFrame):
             raise TypeError("Distance matrix must be a pandas DataFrame.")
         self.points = matrix.columns.tolist()
@@ -815,13 +922,14 @@ class Kmeans(object):
         for i, dist in enumerate(distance):
             self.clusters[np.argmin(dist)].append(self.points[i])
     
-    def __str__(self):
+    def __str__(self) -> str:
         """
             Defines the string representation
         """
         """
             定义字符串表示形式
         """
+
         output_list = []
         for cluster in self.clusters.values():
             output_list.append(str(set(cluster)))
@@ -829,10 +937,31 @@ class Kmeans(object):
         return f"After the first epoch, the clusters are: " + output_string + "."
 
 class HierarchicalClustering(object):
-    def __init__(self):
+    def __init__(self) -> None:
+        """
+            Intialize the object HierarchicalClustering
+        """
+        """
+            初始化对象HierarchicalClustering
+        """
+        # Record the agglomerative procedure
         self.agglomerative = []
         
-    def min_value_index(self, matrix):
+    def min_value_index(self, matrix: pd.DataFrame) -> tuple:
+        """
+            Locate the row and column index of the minimum value
+        """
+        """
+            定位最小值的行索引和列索引
+        """
+
+        '''Parameter:
+            matrix, correponds to the distance matrix.
+        '''
+        '''参数:
+            matrix, 对应距离矩阵。
+        '''
+
         num_cluster = len(matrix.columns)
         min_value = float('inf')
         min_value_row = None
@@ -846,23 +975,36 @@ class HierarchicalClustering(object):
                     min_value_column = j
         return min_value_row, min_value_column
     
-    def update(self, matrix):
+    def update(self, matrix: pd.DataFrame) -> pd.DataFrame:
         """
-            Update the proximity matrix.
+            Operations during the iterations
         """
+        """
+            迭代过程中的操作
+        """
+
+        '''Parameter:
+            matrix, correponds to the distance matrix.
+        '''
+        '''参数:
+            matrix, 对应距离矩阵。
+        '''
+
+        # Merge the two closest clusters / 合并两个最近的簇
         i, j = self.min_value_index(matrix)
         cluster_i, cluster_j = matrix.index[i], matrix.columns[j]
         cluster_new = cluster_i + cluster_j
         self.agglomerative.append(set(cluster_new))
-        
+        # Update the proximity matrix / 更新接近度矩阵
+        # Update the distance between clusters after merged / 更新合并后簇间距离
         distance_i = matrix[cluster_i]
         distance_j = matrix[cluster_j]
         distance_new = pd.concat([distance_i, distance_j], axis=1).min(axis=1)
-        
+        # Delete the merged cluster from the index / 从索引中删除已合并的簇
         index_list = matrix.index.tolist()
         index_list[i] = cluster_new
         del index_list[j]
-        
+        # Delete the merged cluster from the distance matrix i.e. its corresponding row and column / 从距离矩阵中删除已合并的簇, 即其行和列
         matrix[cluster_i] = distance_new
         matrix.loc[cluster_i] = distance_new
         matrix = matrix.drop(cluster_j, axis=0)
@@ -871,17 +1013,37 @@ class HierarchicalClustering(object):
         matrix = matrix.set_axis(index_list, axis=1)
         return matrix
      
-    def fit(self, matrix):
+    def fit(self, matrix: pd.DataFrame) -> None:
+        """
+            Fit the model to the distance matrix
+        """
+        """
+            使模型拟合距离矩阵
+        """
+
+        '''Parameter:
+            matrix, correponds to the distance matrix.
+        '''
+        '''参数:
+            matrix, 对应距离矩阵。
+        '''
+
+        if not isinstance(matrix, pd.DataFrame):
+            raise TypeError("Distance matrix must be a pandas Series.")
+        if not matrix.equals(matrix.T):
+            raise ValueError("Distance matrix must be symmetric.")
+        # Iterate until only a single cluster remains
         while len(matrix) > 1:
             matrix = self.update(matrix)
     
-    def __str__(self):
+    def __str__(self) -> str:
         """
             Defines the string representation
         """
         """
             定义字符串表示形式
         """
+
         output_list = [f"After step {it+1}, the latest merged cluster is: {cluster_result}" for it, cluster_result in enumerate(self.agglomerative)]
         output_string = ";\n".join(output_list)
         return output_string + "."
@@ -914,7 +1076,16 @@ class DBSCAN(object):
             if point not in self.cores and point not in self.borders:
                 self.noises.append(point)
         
-    def fit(self, matrix):
+    def fit(self, matrix) -> None:
+
+        '''Parameter:
+            matrix, correponds to the distance matrix.
+        '''
+        '''参数:
+            matrix, 对应距离矩阵。
+        '''
+
+        # Reject the unexpected inputs / 拒绝意外输入
         self.clusters = []
         self.input_matrix = matrix
         self.points = matrix.columns
@@ -933,21 +1104,86 @@ class DBSCAN(object):
         """
             定义字符串表示形式
         """
+
         output_list = [f"K{k+1} = {cluster}" for k, cluster in enumerate(self.clusters)]
         output_string = ", ".join(output_list)
         return f"Final clustering: {output_string}."
 
 class ClusteringEvaluator(object):
-    def __init__(self, method):
+    """
+        Implement a clustering evaluator, 
+        which can evaluate the clustering results using correlation or sihouette coefficient
+    """
+    """
+        实现一个聚类评价器,
+        可以用相关性或者轮廓系数评价聚类结果
+    """
+
+    def __init__(self, method: str) -> None:
+        """
+            Initialize the object ClusteringEvaluator
+        """
+        """
+            初始化对象ClusteringEvaluator
+        """
+
+        '''Parameter:
+            method, corresponds to the method specified to evaluate the clusetering results; Options: 'correlation', 'sihouette_coefficient'.
+        '''
+        '''参数:
+            method, 对应明确的方法以评估聚类结果; 选项: 'correlation', 'sihouette_coefficient'。
+        '''
+
+        if method not in {'correlation', 'sihouette_coefficient'}:
+            raise ValueError("Method {method} does not exist.")
         self.method = method
         self.method_string = None
     
-    def average_distance(self, mySeries):
+    def average_distance(self, mySeries: pd.Series) -> float:
+        """
+            Compute the average distance between points
+        """
+        """
+            计算点间平均距离
+        """
+        
+        '''Parameter:
+            mySeries, corresponds to a pandas Series, which contains distances between a point and other points
+        '''
+        '''参数:
+            mySeries, 对应一个pandas Series, 包含了一个点和其他点间的距离
+        '''
+
         newSeries = mySeries.copy()
         newSeries = newSeries[mySeries != 0]
         return newSeries.mean()
         
-    def fit(self, cluster_labels, distance_matrix=None, similarity_matrix_distance=None):
+    def fit(self, cluster_labels: pd.Series, 
+            distance_matrix: pd.DataFrame = None, 
+            similarity_matrix_distance: pd.DataFrame = None) -> None:
+        """
+            Fit the ClusteringEvaluator to the clustering results and distance matrix, 
+            or similarity matrix derived from distance matrix.
+            (It depends on the evaluation method we specify.)
+        """
+        """
+            使聚类评价器拟合聚类结果和距离矩阵,
+            或者距离矩阵衍生的相似性矩阵。
+            (它将取决于我们明确的评价方法。)
+        """
+
+        '''Parameters:
+            cluster_labels, corresponds to the cluster results.
+            distance_matrix, corresponds to the distance matrix; Default: None.
+            similarity_matrix_distance, corresponds to the similarity matrix derived from the distance matrix; Default: None.
+        '''
+        '''参数:
+            cluster_labels,
+            distance_matrix,
+            similarity_matrix_distance, 
+        '''
+
+        # Reject the unexpected inputs / 拒绝意外输入
         if not isinstance(cluster_labels, pd.Series):
             raise TypeError("Cluster labels must be a pandas Series.")
         if self.method == 'correlation':
@@ -999,7 +1235,7 @@ class ClusteringEvaluator(object):
             clustering_sihouette_coefficient = np.mean(cluster_sihouette_coefficient)
             self.clustering_quality = clustering_sihouette_coefficient
         
-    def __str__(self):
+    def __str__(self) -> str:
         """
             Defines the string representation
         """
@@ -1012,16 +1248,51 @@ class ClusteringEvaluator(object):
         return f"The evaluation results of the clustering quality using {self.method_string} is {self.clustering_quality:.3f}."
 
 class MarkovChain(object):
-    def __init__(self, transition_matrix, time_sequence=['yesterday', 'today', 'tomorrow', 'the day after tomorrow']):
+    """
+        Implement a simple Markov Chain
+    """
+    """
+        实现一个简单的马尔可夫链
+    """
+
+    def __init__(self, transition_matrix: pd.DataFrame, 
+                 time_sequence: list =['yesterday', 'today', 'tomorrow', 'the day after tomorrow']) -> None:
+        """
+            Initialize the object MarkovChain
+        """
+        """
+            初始化对象MarkovChain
+        """
+        
+        '''Parameters:
+            transition_matrix, corresponds to the transition probability matrix,
+            time_sequence, corresponds to the four time steps. Default: ['yesterday', 'today', 'tomorrow', 'the day after tomorrow'].
+        '''
+        '''
+        '''
+
+        # Reject the unexpected inputs / 拒绝意外输入
+        if len(time_sequence) != 4:
+            raise ValueError("Time sequence must have a length of 4.")
+        if transition_matrix.index.tolist() != transition_matrix.columns.tolist():
+            raise ValueError("The states in transition matrix must be consistent.")
         self.transition_matrix = transition_matrix
         self.time_sequence = time_sequence
         
-    def fit(self, state_sequence):
+    def fit(self, state_sequence: list) -> None:
         if len(state_sequence) != 4:
             raise ValueError("State sequence must have a length of 4.")
         self.state_sequence = state_sequence
         
-    def state_after_next_state(self):
+    def state_after_next_state(self) -> float:
+        """
+            Compute the probability of a specific state after the next state given a current state and a next state
+        """
+        """
+            计算给定当前状态下的下一特定状态的概率
+        """
+
+        # Reject the unexpected inputs / 拒绝意外输入
         if None in self.state_sequence[1:]:
             raise ValueError("Sequence contains None after the first element.")
         self.state_sequence[0] = None
@@ -1031,7 +1302,15 @@ class MarkovChain(object):
         self.probability = self.transition_matrix.loc[current_state, next_state] * self.transition_matrix.loc[next_state, state_after_next_state]
         return self.probability
         
-    def next_state(self):
+    def next_state(self) -> float:
+        """
+            Compute the probability of a specific next state given a current state
+        """
+        """
+            计算给定当前状态下的下一特定状态的概率
+        """
+
+        # Reject the unexpected inputs / 拒绝意外输入
         if None in self.state_sequence[:-1]:
             raise ValueError("Sequence contains None before the last element.")
         self.state_sequence[3] = None
@@ -1040,13 +1319,14 @@ class MarkovChain(object):
         self.probability = self.transition_matrix.loc[current_state, next_state]
         return self.probability
     
-    def __str__(self):
+    def __str__(self) -> str:
         """
             Defines the string representation
         """
         """
             定义字符串表示形式
         """
+
         if self.state_sequence[0] == None:
             output_string = f"{self.state_sequence[2]} {self.time_sequence[2]} and {self.state_sequence[3]} {self.time_sequence[3]}"
         elif self.state_sequence[3] == None:
@@ -1059,30 +1339,65 @@ class HiddenMarkovModel(object):
     """
         实现隐马尔可夫模型"""
 
+    """Examples / 示例:
+    Suppose initial_probability, transition, emission have been already defined 
+    (initial_probability: intial probabilities, transition: transition matrix, emission: emission matrix).
+    假设initial_probability, transition, emission均已被定义
+    (initial_probability: 初始概率, transition: 转移矩阵, emission: 发射矩阵)
+
+    ** 
+    # Example / 示例 1:
+    # Initialize an HiddenMarkovModel object / 实例化一个OneRule对象
+    >>> observations = ['No Umbrella', 'Umbrella']
+    >>> hmm = HiddenMarkovModel(initial_probability, transition, emission)
+    >>> hmm.fit(observations)
+    >>> print(hmm)
+
+
+    """
     def __init__(self, initial_probability: pd.Series, transition: pd.DataFrame, emission: pd.DataFrame) -> None:
         """
-
+            In our implementation, we do not consider HMM Problem 3 (also called Learning problem). 
+            Therefore, we initialize a Hidden Markov Model using the given initial probabilities, transition matrix, and emission matrix.
         """
         """
-
+            在我们的实现中, 我们不考虑HMM问题3(也称为学习问题)。
+            因此, 我们将用给定的初始概率, 转移矩阵, 发射矩阵来初始化一个隐马尔可夫模型。
         """
 
         '''Parameters:
-            initial_probability, corresponds to 
-            transition, corresponds to 
-            emission, corresponds to 
+            initial_probability, corresponds to the initial probabilities of states A_0;
+            transition, corresponds to the transition probability matrix A;
+            emission, corresponds to the emission probability matrix E.
         '''
         '''参数:
-
+            initial_probability, 对应状态A_0的初始概率;
+            transition, 对应转移矩阵A;
+            emission, 对应发射矩阵E。
         '''
 
-        # Check the data type of the inputs / 检查输入的数据类型
+        # Reject the unexpected inputs / 拒绝意外输入
         if not isinstance(initial_probability, pd.Series):
-            raise TypeError(".")
+            raise TypeError("The initial probabilities of states must be a pandas Series.")
         if not isinstance(transition, pd.DataFrame):
-            raise TypeError(".")
+            raise TypeError("The transition probability matrix A must be a pandas DataFrame.")
         if not isinstance(emission, pd.DataFrame):
-            raise TypeError(".")
+            raise TypeError("The emission probability matrix E must be a pandas DataFrame.")
+        if transition.index.tolist() != transition.columns.tolist():
+            raise ValueError("The states in transition probability matrix must be consistent.")
+        if  transition.index.tolist() != initial_probability.index.tolist():
+            raise ValueError("The states of transition probability matrix must match those of initial probabilities.")
+        if transition.index.tolist() != emission.index.tolist():
+            raise ValueError("The states of transition probability matrix must match those of emission matrix.")
+        if not np.isclose(initial_probability.sum(), 1, rtol=1e-6): # To avoid the precision problem
+            raise ValueError("The sum of initial probability must be 1.")
+        for index, data in transition.iterrows():
+            if not np.isclose(data.sum(), 1, rtol=1e-6):
+                raise ValueError("The sum of transition probability matrix must be 1.")
+        for index, data in emission.iterrows():
+            if not np.isclose(data.sum(), 1, rtol=1e-6):
+                raise ValueError("The sum of emission probability matrix must be 1.")
+        # Intialize the object HiddenMarkovModel
         self.initial_probability = initial_probability
         self.transition = transition
         self.emission = emission
@@ -1098,14 +1413,18 @@ class HiddenMarkovModel(object):
             即, 给定一个观测序列, 该序列的概率是多少？
         """
 
-        # Implement the forward algorithm based on matrix operations
+        # Implement the forward algorithm based on matrix operations / 基于矩阵运算实现前向算法
         self.forward_probability = []
         for index, observation in enumerate(self.observations):
+            # Initialization / 初始化: f_k(1) = A_0(k)e_k(x_1)
             if index == 0:
                 self.forward_probability.append(self.emission[observation] * self.initial_probability)
+            # Iteration / 迭代: f_k(i) = e_k(x_i) \Sigma_j f_j(i - 1)a_{jk}
+            # Compute forward probability of state k at time step i / 计算i时刻k状态的前向概率
             else:
                 forward_probability_new = self.emission[observation] * (self.forward_probability[-1] @ self.transition)
                 self.forward_probability.append(forward_probability_new)
+        # Termination / 终止:  P(X) = \Sigma_k f_k(m)
         self.probability = self.forward_probability[-1].sum()
         
     def viterbi(self) -> None:
@@ -1118,20 +1437,27 @@ class HiddenMarkovModel(object):
             即, 给定一个观测序列, 最可能的隐藏状态序列是什么？
         """
         
-        # Implement the viterbi algorithm based on matrix operations
+        # Implement the viterbi algorithm based on matrix operations / 基于矩阵运算实现维比特算法
         self.viterbi_score = []
         self.back_pointers = []
         self.hidden_state_sequence = []
         for index, observation in enumerate(self.observations):
+            # Initialization / 初始化: V_k(1) = A_0(k)e_k(x_1)
             if index == 0:
                 self.viterbi_score.append(self.emission[observation] * self.initial_probability)
+            # Iteration / 迭代
+            #
             else:
                 intermediate = self.viterbi_score[-1] * self.transition.T
+                # Compute Viterbi score of state k at time i / 计算状态k在i时刻的维比特得分
+                # V_k(i) = e_k(x_i)max_j(V_j)a_{jk}
                 viterbi_score_new = self.emission[observation] * intermediate.max(axis=1)
+                # Back-pointer of the state k at time i / 状态k在i时刻的回指指针
+                # Ptr_k(i) = argmax_j V_j(i - 1) a_{jk}
                 back_pointer = intermediate.idxmax(axis=1).tolist()
                 self.viterbi_score.append(viterbi_score_new)
                 self.back_pointers.append(back_pointer)
-        
+        # Termination and trace-back / 终止和回溯
         best_last_state = self.viterbi_score[-1].idxmax()
         self.hidden_state_sequence.append(best_last_state)
         for back_pointer in reversed(self.back_pointers):
@@ -1153,19 +1479,21 @@ class HiddenMarkovModel(object):
             observations, 对应一个观测序列的列表。
         '''
 
-        # Check the data type of the inputs / 检查输入的数据类型
+        # Reject the unexpected inputs / 拒绝意外输入
         if not isinstance(observations, (list, np.ndarray, pd.Series)):
             raise TypeError("The observation sequence must be a list, numpy ndarray or pandas Series.")
-        # 
+        # If there is any observation in the observation sequence does not match the existing observations in the emission probability matrix, this error will be raised.
+        # 如果有任何在观测序列中的观测与在发射概率矩阵中已知观测不匹配, 这个错误将被抛出。
         if not set(observations).issubset(set(self.emission.columns.tolist())):
             raise ValueError("Some of observations do not match the emission probability matrix.")
-        #
+        # If the parameter 'observations' passed is an empty list, this error will be raised.
+        # 如果传入参数'observations'是一个空列表, 这个错误将被抛。
         if len(observations) == 0:
             raise IndexError("The observation sequence must have at least one observation.")
         self.observations = observations
-        # Apply the Forward algorithm
+        # Apply the Forward algorithm / 应用前向算法
         self.forward()
-        # Apply the Viterbi algorithm
+        # Apply the Viterbi algorithm / 应用维比特算法
         self.viterbi()
     
     def __str__(self) -> str:
@@ -1175,6 +1503,7 @@ class HiddenMarkovModel(object):
         """
             定义字符串表示形式
         """
+
         observation_sequence = ", ".join(self.observations)
         most_likely_sequence = ", ".join(self.hidden_state_sequence)
         observation_result = f"The probability of the observation sequence {observation_sequence} is {self.probability:.3f}"
