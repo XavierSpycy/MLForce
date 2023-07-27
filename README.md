@@ -7,7 +7,7 @@
 ## Introduction
 My library, named "MLForce" which stands for Machine Learning Force, is a comprehensive Python toolkit meticulously crafted to cater to the needs of machine learning beginners. With a user-friendly design, it aims to empower aspiring data enthusiasts and learners in the fields of machine learning and data analysis. Each module in "MLForce" serves a distinct purpose, providing a seamless and efficient experience for users throughout the entire machine learning journey.
 
-By combining ease of use with powerful functionality, this library aims to nurture your understanding and practical skills in machine learning, unlocking the doors to endless possibilities in the realm of data-driven solutions. So, embrace "MaLL" and embark on a rewarding journey of mastering the art of machine learning!
+By combining ease of use with powerful functionality, this library aims to nurture your understanding and practical skills in machine learning, unlocking the doors to endless possibilities in the realm of data-driven solutions. So, embrace "MLForce" and embark on a rewarding journey of mastering the art of machine learning!
 
 ## Installation
 You can install MLForce using pip:
