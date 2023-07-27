@@ -1,17 +1,17 @@
-# Machine Learning Starter
+# Machine Learning Force -- MLForce
 ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/XavierSpycy/mlsolutions/main)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/XavierSpycy/mlsolutions/main?labpath=test.ipynb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Introduction
-My library, named "MLStarter" which stands for Machine Learning Starter, is a comprehensive Python toolkit meticulously crafted to cater to the needs of machine learning beginners. With a user-friendly design, it aims to empower aspiring data enthusiasts and learners in the fields of machine learning and data analysis. Each module in "MLStarter" serves a distinct purpose, providing a seamless and efficient experience for users throughout the entire machine learning journey.
+My library, named "MLForce" which stands for Machine Learning Force, is a comprehensive Python toolkit meticulously crafted to cater to the needs of machine learning beginners. With a user-friendly design, it aims to empower aspiring data enthusiasts and learners in the fields of machine learning and data analysis. Each module in "MLStarter" serves a distinct purpose, providing a seamless and efficient experience for users throughout the entire machine learning journey.
 
 By combining ease of use with powerful functionality, this library aims to nurture your understanding and practical skills in machine learning, unlocking the doors to endless possibilities in the realm of data-driven solutions. So, embrace "MaLL" and embark on a rewarding journey of mastering the art of machine learning!
 
 ## Installation
-You can install MLStarter using pip:
+You can install MLForce using pip:
 ```
-pip install mlstarter
+pip install mlforce
 ```
 
 ## Quick Start
@@ -19,8 +19,8 @@ Here's a quick example of how to use MLStarter Library:
 
 ```python
 # Import modules
-from mlstarter.datasets import StandardDataset
-from mlstarter.mlsolutions import KNearestNeighbor
+from mlforce.datasets import StandardDataset
+from mlforce.mlsolutions import KNearestNeighbor
 
 # Load the datasets
 ds = StandardDataset()
@@ -58,7 +58,7 @@ print(knn)
 For more detailed usage instructions, check out the Documentation.
 
 ## Contributing
-Contributions are welcome! If you find any issues or have suggestions for improvement, please [Open an issue](https://github.com/XavierSpycy/MLStarter/issues) or submit a pull request.
+Contributions are welcome! If you find any issues or have suggestions for improvement, please [Open an issue](https://github.com/XavierSpycy/MLForce/issues) or submit a pull request.
 
 
 ## License
