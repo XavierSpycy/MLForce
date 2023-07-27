@@ -17,223 +17,10 @@ In future updates, we will strive to enhance the efficiency of various algorithm
 因此我们并未追求具体的算法部分的最优实现。
 在今后的更新中, 我们将会力求完善不同算法的效率, 并满足用户的多种需求。"""
 
-from typing import Union
 import numpy as np
 import pandas as pd
 from scipy.stats import norm, pearsonr
 from functools import reduce
-
-class datasets(object):
-    """
-        datasets class which is used to implement dataset read operations.
-    """
-    """
-        datasets类, 用于实现数据集读取操作。
-    """
-
-    def __init__(self):
-        """
-            Set file read path.
-        """
-        """
-            设置文件读取路径。
-        """
-
-        self.path = ('./data/')
-
-    def reset(self):
-        """
-            This method will reset all attributes that were set during the previous data loading process, 
-            thus preventing any potential confusion for users.
-        """
-        """
-            这个方法将重置在上一次数据加载过程中设置的所有属性, 
-            从而避免可能对用户产生的任何潜在困惑。
-        """
-        
-        self.dataset = None
-        self.matrix = None
-        self.data = None
-        self.target = None
-        self.new_example = None
-        self.cluster_labels = None
-        self.initial_probability = None
-        self.transition = None
-        self.emission = None
-
-    def load_data(self, file, option='train'):
-        """
-            Define a uniform data reading method.
-        """
-        """
-            定义统一的数据读取方式。
-        """
-        
-        '''Parameters:
-            file, corresponds to the file name;
-            option, corresponds to the type of data being read.
-            Specifically, 'train' indicates training data, that is, the data columns are features, 
-            and each row corresponds to a training sample;
-            'matrix' indicates that the data being read is a specific matrix, 
-            including: distance matrix, similarity matrix, transition matrix, emission matrix, etc.
-            Default: 'train'.
-        '''
-        '''参数：
-            file, 对应文件名;
-            option, 对应所读的数据类型。
-            其中, 'train'指训练数据, 即数据的列为特征, 
-            每一行为一个训练样本;
-            'matrix'表示所读的数据为一个特定矩阵, 包括: 距离矩阵、相似性矩阵、转移矩阵、发射矩阵等。
-            Default: 'train'.
-        '''
-
-        # Call reset method
-        # 调用reset方法
-        self.reset()
-        self.option = option
-        if option == 'train':
-            # If the 'option' parameter is set to 'train', 
-            # then the last column of the data frame is the label, 
-            # and the rest of the columns are features.
-            # 若option参数值为'train', 
-            # 则数据框中的最后一列为标签, 
-            # 其余列为特征。
-            self.dataset = pd.read_csv(self.path + file)
-            self.data = self.dataset[self.dataset.columns[:-1]]
-            self.target = self.dataset[self.dataset.columns[-1]]
-        elif option == 'matrix':
-            # If the 'option' parameter is set to 'matrix', then the first column of the data frame is the row index.
-            # 若option参数值为'matrix', 则数据框中的第一列为索引。
-            self.dataset = pd.read_csv(self.path + file, index_col=0)
-            
-        
-    def overview(self):
-        """
-            When this method is called, it will print the data loaded in the current dataset. 
-            The specific content to be printed will be determined by the actual situation of the current dataset.
-        """
-        """
-            调用该方法时, 将会打印当前数据集中加载的数据。
-            具体的打印内容将会由当前数据集的实际情况而决定。
-        """
-        
-        if self.option == 'train':
-            print("The training set is:")
-            print(self.dataset)
-            if self.new_example is not None:
-                print()
-                print("The new example is:")
-                print(self.new_example)
-        elif self.option == 'matrix':
-            if self.matrix == 'distance':
-                print("The distance matrix is:")
-                print(self.dataset)
-                if self.cluster_labels is not None:
-                    print()
-                    print("The cluster labels are:")
-                    print(self.cluster_labels)
-            elif self.matrix == 'similarity':
-                print("The similarity matrix is:")
-                print(self.dataset)
-            elif self.matrix == 'markov':
-                print("The transition matrix is:")
-                print(self.dataset)
-            elif self.matrix == 'hiddenmarkov':
-                print("The initial probabilities are:")
-                print(self.initial_probability.to_string(dtype=False))
-                print()
-                print("The transition matrix is:")
-                print(self.transition)
-                print()
-                print("The emission matrix is:")
-                print(self.emission)
-
-    def load_knn(self, mode):
-        """
-            Load the K-nearest neighbors dataset.
-        """
-        """
-            加载K最近邻数据集
-        """
-        
-        '''Parameter:
-            mode, corresponds to the '''
-        if mode == 'numeric':
-            self.load_data('knn1.csv')
-            self.new_example = pd.DataFrame({'a1': 2, 'a2': 4, 'a3': 2}, index=[0])
-        elif mode == 'nominal':
-            self.load_data('knn2.csv')
-            self.new_example = pd.DataFrame({'age': '<=30', 'income': 'medium', 'student': 'yes', 'credit rating': 'fair'}, index=[0])
-    
-    def load_onerule(self):
-        """"""
-        self.load_data('1r.csv')
-        self.new_example = pd.DataFrame({'credit history': 'unknown', 'debt': 'low', 'deposit': 'none', 'income': 'average'}, index=[0])
-
-    def load_prism(self):
-        self.load_data('prism.csv')
-    def load_naivebayes(self, code):
-        if code == 'No.1':
-            self.load_data('nb1.csv')
-            self.new_example = pd.DataFrame({'home owner': 'no', 'marital status': 'married', 'income': 'very high'}, index=[0])
-        elif code == 'No.2':
-            self.load_data('nb2.csv')
-            self.new_example = pd.DataFrame({'home owner': 'no', 'marital status': 'married', 'income': '120'}, index=[0])
-        elif code == 'No.3':
-            self.load_data('nb3.csv')
-            self.new_example = pd.DataFrame({'location': 'boring', 'weather': 'sunny', 'companion': 'annoying', 'expensive': 'Y'}, index=[0])
-
-    def load_decisiontree(self, code):
-        if code == 'No.1':
-            self.load_data('dt1.csv')
-        elif code == 'No.2':
-            self.load_data('dt2.csv')
-
-    def load_perceptron(self):
-        self.load_data('perceptron.csv')
-
-    def load_kmeans(self, code):
-        if code == 'No.1':
-            self.load_data('kmeans1.csv', option='matrix')
-        elif code == 'No.2':
-            self.load_data('kmeans2.csv', option='matrix')
-        self.matrix = 'distance'
-
-    def load_hierarchical(self):
-        self.load_kmeans('No.1')
-    
-    def load_dbscan(self, code):
-        if code == 'No.1':
-            self.load_data('dbscan1.csv', option='matrix')
-            self.matrix = 'distance'
-        elif code == 'No.2':
-            self.load_data('dbscan2.csv', option='matrix')
-            self.matrix = 'distance'
-
-    def load_cluster_evaluate(self, method):
-        if method == 'sihouette_coefficient':
-            self.load_data(method + '.csv', option='matrix')
-            self.matrix = 'distance'
-        elif method == 'correlation':
-            self.load_data(method + '.csv', option='matrix')
-            self.matrix = 'similarity'
-        self.cluster_labels_table = pd.read_csv(self.path + 'clusterlabels.csv', index_col=0)
-        self.cluster_labels = self.cluster_labels_table['cluster label']
-    
-    def load_markov(self):
-        self.load_data('mm.csv', option='matrix')
-        self.matrix = 'markov'
-    
-    def load_hidden_markov(self, code):
-        if code == 'No.1':
-            self.initial_probability = pd.Series({'Sunny': 0.4, 'Rainy': 0.3, 'Foggy': 0.3})
-        elif code == 'No.2':
-            self.initial_probability = pd.Series({'Sunny': 0.5, 'Cloudy': 0.5})
-        transition = f'transition{code[-1]}.csv'
-        emission = f'emission{code[-1]}.csv'
-        self.transition = pd.read_csv(self.path + transition, index_col=0)
-        self.emission = pd.read_csv(self.path + emission, index_col=0)
-        self.matrix = 'hiddenmarkov'
 
 class KNearestNeighbor(object):
     """
@@ -244,10 +31,16 @@ class KNearestNeighbor(object):
     """
     
     """Example/示例:
-        >>> knn = KNearestNeighbor(k=1)
+        Suppose X, y, and new_example have been already defined (X: training inputs, y: training labels, new_examples: new examples).
+        假设X, y, new_examples均已被定义(X: 训练输入, y: 训练标签, new_examples: 新样例)
+
+        >>> knn = KNearestNeighbor(k=3)
         >>> knn.fit(X, y)
-        >>> prediction = knn.predict(new_example)
+        >>> prediction = knn.predict(new_examples)
         >>> print(knn)
+        >>> The closest nearest neighbors are ex.5, 15, 12. The majority of Movie is B; hence, 3-Nearest Neighbor predicts Movie = B.
+            The closest nearest neighbors are ex.5, 10, 2. The majority of Movie is A; hence, 3-Nearest Neighbor predicts Movie = A.
+            The closest nearest neighbors are ex.3, 12, 13. The majority of Movie is B; hence, 3-Nearest Neighbor predicts Movie = B.
     """
 
     def __init__(self, k: int) -> None:
@@ -264,6 +57,12 @@ class KNearestNeighbor(object):
         '''参数:
             k, 对应k最近邻中的k值。
         '''
+
+        """
+            Very sensitive to the value of k / 对k值敏感
+            Rule of thumb: k <= sqrt(number of training examples) / 经验法则: k <= sqrt(训练样例的数量)
+            Commercial packages typically use k = 10 / 商业包通常用k = 10
+        """
 
         # Check the data type of the inputs / 检查输入的数据类型
         if not isinstance(k, int):
@@ -314,7 +113,8 @@ class KNearestNeighbor(object):
                     feature_type = 'nominal'
                 if feature_type != self.feature_type:
                     raise TypeError("Data type must be normalized.")
-                
+        
+        # Store the training examples / 储存训练样例
         self.features = set(X_train.columns.tolist())
         self.category = y_train.name
         self.train_examples = X_train.index
@@ -371,7 +171,7 @@ class KNearestNeighbor(object):
                 self.evidences.append(self.train_examples[sorted_indices].tolist())
         return pd.Series(self.predictions)
         
-    def __str__(self):
+    def __str__(self) -> str:
         """
             Defines the string representation
         """
@@ -380,6 +180,8 @@ class KNearestNeighbor(object):
         """
         
         # Distinguish a subtle variation when "k" is singular or plural / 区别当k为单数或复数时细微的不同
+        if not hasattr(self, 'evidences'):
+            return "To reach your expectation, please ensure that you have called the 'predict' method first."
         if self.k == 1:
             string_evidence = ["The closest nearest neighbor is ex." + ", ".join(map(str, evidence)) for evidence in self.evidences]
             string_prediction = [f"Hence, {self.k}-Nearest Neighbor predicts {self.category} = {prediction}." for prediction in self.predictions]
@@ -400,11 +202,11 @@ class OneRule(object):
     """
     
     """Examples / 示例:
-        Suppose X, y, and new_example have been already defined (X: training inputs, y: training labels, new_example: new example).
-        假设X, y, new_example均已被定义(X: 训练输入, y: 训练标签, new_example: 新样例)
+        Suppose X, y, and new_example have been already defined (X: training inputs, y: training labels, new_examples: new examples).
+        假设X, y, new_example均已被定义(X: 训练输入, y: 训练标签, new_examples: 新样例)
         
         **
-        # Example / 示例 1:
+        # Example / 示例:
         # Initialize an OneRule object / 实例化一个OneRule对象
         >>> oneR = OneRule()
         # Fit the model to the data / 使模型拟合数据
@@ -414,40 +216,40 @@ class OneRule(object):
         # Predict the output(s) / 基于规则预测数据
         # The variable "prediction" will store the model's prediction(s) based on the test inputs.
         # 变量"prediction"将会储存模型基于测试输入的的输出。
-        >>> prediction = oneR.predict(new_example)
+        >>> prediction = oneR.predict(new_examples)
         # 打印模型输出
         >>> print(oneR)
         
         # The output will be in the following format / 输出形如: 
-        >>> The rule based on income has the minimum number of errors, whose error rate is 0.214. Hence, 1R produces the following rule: 
-        if income = low then risk = high; else if income = average then risk = high;
-        else if income = high then risk = low.
-        
-        The new exapmle has income = average and hence will be classified as risk = high.
+        >>> The rule based on Age has the minimum number of errors, whose error rate is 0.500. Hence, 1R produces the following rule:
+            if Age = <18 then Vote = Neutral; else if Age = >60 then Vote = No; else if Age = [35, 60] then Vote = Yes; else if Age = [18, 35) then Vote = Yes.
 
-        **
-        # Example / 示例 2:
-        # If you will not reference the prediction(s) in the subsequent operations, you can also omit the assignment step.
-        # 如果您在后续的操作中将不引用预测值, 您可以省略赋值步骤。
-        >>> oneR = OneRule()
-        >>> oneR.fit(X, y)
-        >>> oneR.generate()
-        >>> oneR.predict(new_example)
-        >>> print(oneR)
+            The new example 0 has Age = <18 and hence will be classified as Vote = Neutral.
+            The new example 1 has Age = >60 and hence will be classified as Vote = No.
         
-        **
-        # Example / 示例 3:
-        # If you do not have any new examples, you can simply utilize our model using the following approach.
-        # 如果您没有任何新样例, 您可以简单地使用如下方法应用我们的模型。
-        >>> oneR = OneRule()
-        >>> oneR.fit(X, y)
-        >>> oneR.generate()
-        >>> print(oneR)
-
-        # The output will not cover the prediction(s).
     """
 
-    def fit(self, X, y):
+    def __init__(self, bins:int = 5) -> None:
+        """
+            Initialize the object OneRule
+        """
+        """
+            初始化对象OneRule
+        """
+
+        '''Parameter:
+            bins, corresponds to the number of bins when fitting the model to numerical attributes; Default: 5.
+        '''
+        '''参数:
+            bins, 对应当使模型拟合数值属性时的区间数量。
+        '''
+
+        # Reject the unexpected inputs / 拒绝意外输入
+        if not isinstance(bins, int):
+            raise TypeError("Discretization parameter must be an integer.")
+        self.bins = bins
+
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame) -> None:
         """
             Fit the model to the training data
         """
@@ -464,11 +266,19 @@ class OneRule(object):
             y, 对应训练标签。
         '''
         
-        # Check the data type of the inputs / 检查输入的数据类型
+        # Reject the unexpected inputs / 拒绝意外输入
         if not isinstance(X, pd.DataFrame):
-            raise TypeError("Training data must be a pandas DataFrame.")
+            raise TypeError("Inputs must be a pandas DataFrame.")
         if not isinstance(y, pd.Series):
-            raise TypeError("Training labels must be a pandas Series.")
+            raise TypeError("Labels must be a pandas Series.")
+        if len(X) != len(y):
+            raise RuntimeError("Length of inputs and labels must match.")
+        
+        # Discretize the numerical attributes / 离散化数值属性
+        for column in X.columns:
+            if pd.api.types.is_numeric_dtype(X[column]):
+                X[column] = pd.cut(X[column], bins=self.bins)
+            
         # Convert the column index into a list object / 将列索引转化为列表对象
         self.features = X.columns.tolist()
         # Store the class name of the labels / 储存标签的类名
@@ -503,25 +313,33 @@ class OneRule(object):
             
     def generate(self) -> None:
         """
+            Generate the rule in the string format
         """
         """
+            生成字符串形式的规则
         """
 
+        # Merge the rules stored in the list into a string / 合并存放在列表中的规则为一个字符串
         self.generated_rule_list = []
         for feature, prediction in self.feature_prediction_pairs.items():
             self.generated_rule_list.append(f"if {self.best_feature} = {feature} then {self.labelname} = {prediction}")
         self.generated_rule = "; else ".join(self.generated_rule_list) + "."
     
-    def predict(self, X_test: pd.DataFrame) -> Union[int, str, pd.Series]:
+    def predict(self, X_test: pd.DataFrame) -> pd.Series:
+        """
+            Predict the labels for the test inputs
+        """
+        """
+            为测试输入预测标签
         """
 
-        """
-        """
-        """
-
-        # Check
+        # # Reject the unexpected inputs / 拒绝意外输入
+        if not isinstance(X_test, pd.DataFrame):
+            raise TypeError("Inputs must be a pandas DataFrame..")
         if self.best_feature not in X_test:
             raise ValueError("The best attribute is not in present in the test data.")
+        
+        # Predict labels for the test inputs using the generated rule / 用生成的规则为测试输入预测标签
         self.new_examples = X_test.index.tolist()
         self.predictions = []
         self.rule_based = []
@@ -542,23 +360,43 @@ class OneRule(object):
 
         rule_result = ""
         prediction_result = ""
-        if self.generated_rule is not None:
-            rule_result = f"""The rule based on {self.best_feature} has the minimum number of errors, whose error rate is {self.best_error_rate:.3f}. Hence, 1R produces the following rule: 
-{self.generated_rule}\n\n"""
-        if self.predictions is not None:
+        if hasattr(self, 'generated_rule'):
+            rule_result = f"The rule based on {self.best_feature} has the minimum number of errors, whose error rate is {self.best_error_rate:.3f}. Hence, 1R produces the following rule:\n{self.generated_rule}\n"
+        else:
+            return "To reach your expectation, please ensure that you have called the 'generate' method first."
+        if hasattr(self, 'predictions'):
             prediction_string = [f"The new example {new_example} has {self.best_feature} = {rule} and hence will be classified as {self.labelname} = {prediction}." for new_example, rule, prediction in zip(self.new_examples, self.rule_based, self.predictions)]
             prediction_result = "\n".join(prediction_string)
-        return rule_result + prediction_result
+        return rule_result + "\n" + prediction_result
 
 class PRISM(object):
     """
-        Implement PRISM, a rule-based covering algorithm
+        Implement PRISM, a rule-based covering algorithm;
+        It constructs a set of if-then rulses that cover all examples from a certain class 
+        and do not cover any examples from the other classes.
     """
     """
-        实现PRISM, 一种基于规则的覆盖算法
+        实现PRISM, 一种基于规则的覆盖算法;
+        它构建一个if-then规则的集合, 覆盖来自特定类别的所有样例
+        并且不覆盖任何来自其他类别的样例。
+    """
+
+    """Examples / 示例:
+        Suppose X, y, and new_example have been already defined (X: training inputs, y: training labels, new_examples: new examples).
+        假设X, y, new_example均已被定义(X: 训练输入, y: 训练标签, new_examples: 新样例)
+        
+        **
+        # Example / 示例:
+        
+        
     """
 
     def best_condition(self, inputs, labels):
+        """
+            Compute the optimal feature and its optimal value which should be added into the rules in the recent feature space
+        """
+        """
+        """
         best_correct = 0
         best_accuracy = 0.0
         best_feature = None
@@ -605,8 +443,10 @@ class PRISM(object):
             combined_conditions = reduce(lambda x, y: x & y, conditions)
             inputs = inputs[~combined_conditions]
             labels = labels[~combined_conditions]
+            if len(labels.unique()) <= 1:
+                break
     
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame) -> None:
         """
             Fit the model to the data
         """
@@ -622,6 +462,14 @@ class PRISM(object):
             X, 对应训练输入;
             y, 对应训练标签。
         '''
+
+        # Reject the unexpected inputs / 拒绝意外输入
+        if not isinstance(X, pd.DataFrame):
+            raise TypeError("Inputs must be a pandas DataFrame.")
+        if not isinstance(y, pd.Series):
+            raise TypeError("Labels must be a pandas Series.")
+        if len(X) != len(y):
+            raise RuntimeError("Length of inputs and labels must match.")
 
         # Since we might have to generate rules for different class,
         # we need to record the original data.
@@ -642,9 +490,9 @@ class PRISM(object):
         '''
         '''
         
-        # Check
+        # Reject the unexpected inputs / 拒绝意外输入
         if target_class not in self.original_labels.unique().tolist():
-            raise ValueError("The target class is not in present in the test data.")
+            raise ValueError("The target class is not present in labels.")
         self.target_class = target_class
         self.output_string = []
         self.temporary_inputs = self.original_inputs
@@ -659,8 +507,75 @@ class PRISM(object):
         """
             定义字符串表示形式
         """
+
         output_string = ";\n".join(self.output_string)
         return f"For {self.labelname} = {self.target_class}, PRISM generates the following rule(s):\n{output_string}."
+
+class SimpleLinearRegression(object):
+    """
+        Implement a simple linear regression
+    """
+    """
+        实现一个一元线性回归
+    """
+
+    def fit(self, x, y):
+        n = len(x)
+
+        self.b_1 = (np.sum(x * y) - np.sum(x) * np.sum(y) / n) / (np.sum(np.power(x, 2)) - np.power(np.sum(x), 2) / n)
+        self.b_0 = np.mean(y) - self.b_1 * np.mean(x)
+
+    def predict(self, x):
+        return self.b_0 + self.b_1 * x
+    
+    def R_square(self, x, y):
+        y_hat = self.predict(x)
+        y_bar = np.mean(y)
+        SSR = np.sum(np.power(y_hat - y_bar, 2))
+        SST = np.sum(np.power(y - y_bar, 2))
+        return SSR / SST
+    
+    def MAE(self, x, y):
+        """
+            Compute the Mean Absolute Error
+        """
+        n = len(x)
+        y_hat = self.predict(x)
+        return 1 / n * np.sum(np.abs(y_hat - y))
+    
+    def MSE(self, x, y):
+        """
+            Compute the Mean Squared Error
+        """
+        n = len(x)
+        y_hat = self.predict(x)
+        return 1 / n * np.sum(np.power(y_hat - y, 2))
+    
+    def RMSE(self, x, y):
+        """
+            Compute the Root Mean Squared Error
+        """
+        return np.sqrt(self.MSE(x, y))
+    
+class LinearRegression(object):
+    """
+        Implement a linear regression, suitable for simple and multiple linear regression
+    """
+    """
+        实现一个线性回归, 适用于一元和多元线性回归
+    """
+
+    def fit(self, X, y):
+        n = len(y)
+        X = np.column_stack((np.ones(n), X))  # Add a column of ones for the intercept term / 为截距项增加一列1
+
+        # Calculate the coefficient vector using the normal equation
+        self.coefficients = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(y)
+
+    def predict(self, X):
+        n = len(X)
+        X = np.column_stack((np.ones(n), X))  # Add a column of ones for the intercept term / 为截距项增加一列1
+        return X.dot(self.coefficients[1:]) + self.coefficients[0]
 
 class NaiveBayes(object):
     def probability_hypothesis(self, y_train):
@@ -822,15 +737,32 @@ class Perceptron(object):
             Initialize the object Perceptron
         """
         """
+            初始化对象Perceptron
         """
+
+        '''Parameters:
+            n_in, corresponds to the number of input features;
+            default, corresponds to whether the parameters will be assigned default values.
+        '''
+        '''参数:
+            n_in, 对应输入特征的数量;
+            default, 对应参数是否赋默认值。
+        '''
+
         self.n_in = n_in
         if default:
+            # Initialize the weights and the bias using default values (all zeros)
             self.weights = np.zeros(n_in)
             self.bias = 0
             
     def initialize_weights(self, weights, bias):
         """
+            weights,
+            bias, 
         """
+        """
+        """
+
         # Check the data type of the inputs / 检查输入的数据类型
         if not isinstance(weights, np.ndarray):
             raise TypeError("The input of the weights must be a numpy ndarray.")
@@ -839,7 +771,7 @@ class Perceptron(object):
         self.weights = weights
         self.bias = bias
         
-    def step(self, x):
+    def step(self, x) -> int:
         """
             Define the step function
         """
@@ -1137,7 +1069,6 @@ class ClusteringEvaluator(object):
         if method not in {'correlation', 'sihouette_coefficient'}:
             raise ValueError("Method {method} does not exist.")
         self.method = method
-        self.method_string = None
     
     def average_distance(self, mySeries: pd.Series) -> float:
         """
@@ -1243,7 +1174,7 @@ class ClusteringEvaluator(object):
             定义字符串表示形式
         """
 
-        if self.method_string is None:
+        if not hasattr(self, 'method_string'):
             self.method_string = self.method
         return f"The evaluation results of the clustering quality using {self.method_string} is {self.clustering_quality:.3f}."
 
