@@ -1,5 +1,6 @@
 # Machine Learning Force -- MLForce
 ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/XavierSpycy/mlsolutions/main)
+![PyPI - Downloads](https://img.shields.io/pypi/:period/:mlforce)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/XavierSpycy/mlsolutions/main?labpath=test.ipynb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
