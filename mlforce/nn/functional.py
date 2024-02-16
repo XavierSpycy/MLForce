@@ -1,13 +1,15 @@
+import typing
+
 import numpy as np
 from scipy.optimize import fsolve
-from typing import Callable, Dict
+
 
 class Activation(object):
     """
     Activation functions and their derivatives.
     """
 
-    def inverse(self, f: Callable[[np.array], np.array], y: np.array) -> np.array:
+    def inverse(self, f: typing.Callable[[np.array], np.array], y: np.array) -> np.array:
         """
         Compute the inverse of an activation function.
 
@@ -224,7 +226,7 @@ class Activation(object):
         x -= np.max(x, axis=1, keepdims=True)
         return np.exp(x) / np.sum(np.exp(x), axis=1, keepdims=True)
     
-    def __init__(self, activation: str, activation_params: Dict[str, float]={}) -> None:
+    def __init__(self, activation: str, activation_params: typing.Dict[str, float]={}) -> None:
         """
         Initialize the activation function.
 

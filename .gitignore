@@ -1,2 +1,5 @@
-*.cpython-38.pyc
-*.cpython-39.pyc
+*.pyc
+build/*
+dist/*
+mlforce.egg-info/*
+.DS_Store

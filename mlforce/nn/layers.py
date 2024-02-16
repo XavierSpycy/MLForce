@@ -1,5 +1,7 @@
+import typing
+
 import numpy as np
-from typing import Union, Dict
+
 from nn.functional import Activation
 
 class Input(object):
@@ -23,8 +25,8 @@ class Dense(object):
     Dense layer
     """
     def __init__(self, units: int,
-                 activation: Union[str, None]=None, activation_params: Dict[str, float]={},
-                 init: str='xavier_uniform', init_params: Dict[str, Union[float, str]]={}) -> None:
+                 activation: typing.Union[str, None]=None, activation_params: typing.Dict[str, float]={},
+                 init: str='xavier_uniform', init_params: typing.Dict[str, typing.Union[float, str]]={}) -> None:
         """
         Initialize the Dense layer.
 
@@ -64,7 +66,7 @@ class Dense(object):
         # Initialize the gradients of biases
         self.grads['b'] = np.zeros(self.params['b'].shape)
 
-    def set_init_params(self, init_params: Dict[str, Union[float, str]]) -> None:
+    def set_init_params(self, init_params: typing.Dict[str, typing.Union[float, str]]) -> None:
         """
         Set the parameters of the initialization method.
 
@@ -211,7 +213,7 @@ class Activ(object):
     """
     Activation layer
     """
-    def __init__(self, activation: str='linear', activation_params: Dict={}) -> None:
+    def __init__(self, activation: str='linear', activation_params: typing.Dict={}) -> None:
         """
         Initialize the Activation layer.
 
