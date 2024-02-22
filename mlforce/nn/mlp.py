@@ -6,10 +6,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-from nn.layers import Input, Dense, Dropout, BatchNorm, Activ
-from nn.functional import Activation
-from nn.optim import Optimizer
-from nn.callbacks import EarlyStopping
+from mlforce.nn.layers import Input, Dense, Dropout, BatchNorm, Activ
+from mlforce.nn.functional import Activation
+from mlforce.nn.optim import Optimizer
+from mlforce.nn.callbacks import EarlyStopping
 
 class MultilayerPerceptron(object):
     """

@@ -1,4 +1,4 @@
-from mlforce.mf import (
+from mlforce.mf.nmf import (
     BasicNMF,
     L2NormNMF,
     KLDivergenceNMF,

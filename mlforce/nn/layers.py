@@ -2,7 +2,7 @@ import typing
 
 import numpy as np
 
-from nn.functional import Activation
+from mlforce.nn.functional import Activation
 
 class Input(object):
     """
