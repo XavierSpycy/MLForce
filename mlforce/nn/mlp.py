@@ -1,13 +1,15 @@
 import time
 import joblib
+import typing
+
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Generator, Union, Tuple, Dict
 from tqdm import tqdm
-from nn.layers import Input, Dense, Dropout, BatchNorm, Activ
-from nn.functional import Activation
-from nn.optim import Optimizer
-from nn.callbacks import EarlyStopping
+
+from mlforce.nn.layers import Input, Dense, Dropout, BatchNorm, Activ
+from mlforce.nn.functional import Activation
+from mlforce.nn.optim import Optimizer
+from mlforce.nn.callbacks import EarlyStopping
 
 class MultilayerPerceptron(object):
     """
@@ -64,7 +66,7 @@ class MultilayerPerceptron(object):
         self.layers[-1].n_in = n_out
         self.stacked = True
 
-    def compile(self, optimizer: Union[str, Optimizer], metrics: list=[], scheduler=None) -> None:
+    def compile(self, optimizer: typing.Union[str, Optimizer], metrics: list=[], scheduler=None) -> None:
         """
         Compile the model.
 
@@ -129,7 +131,7 @@ class MultilayerPerceptron(object):
             # Compute the gradients of the current layer.
             delta = layer.backward(delta)
 
-    def criterion(self, y: np.ndarray, y_hat: np.ndarray) -> Tuple[float, np.ndarray]:
+    def criterion(self, y: np.ndarray, y_hat: np.ndarray) -> typing.Tuple[float, np.ndarray]:
         """
         Compute the loss and the error of the output layer.
 
@@ -204,7 +206,7 @@ class MultilayerPerceptron(object):
                 layer.set_weights(weights)
     
     def fit(self, X_: np.ndarray, y_: np.ndarray, batch_size: int=32, epochs: int=100, 
-            validation_data: Tuple[np.ndarray, np.ndarray]=None, callbacks: list=[], use_progress_bar: bool=False) -> None:
+            validation_data: typing.Tuple[np.ndarray, np.ndarray]=None, callbacks: list=[], use_progress_bar: bool=False) -> None:
         """
         Fit the model to the data.
 
@@ -335,7 +337,7 @@ class MultilayerPerceptron(object):
         """
         return joblib.load(filename)
     
-    def plot_loss(self, figsize: Tuple=(15, 4), grid: bool=True, xlabel: str='Epochs', ylabel: str='Loss') -> None:
+    def plot_loss(self, figsize: typing.Tuple=(15, 4), grid: bool=True, xlabel: str='Epochs', ylabel: str='Loss') -> None:
         """
         Plot the loss of the model.
 
@@ -354,7 +356,7 @@ class MultilayerPerceptron(object):
             plt.grid()
         plt.show()
 
-    def plot_accuracy(self, figsize: Tuple=(15, 4), grid: bool=True, xlabel: str='Epochs', ylabel: str='Accuracy') -> None:
+    def plot_accuracy(self, figsize: typing.Tuple=(15, 4), grid: bool=True, xlabel: str='Epochs', ylabel: str='Accuracy') -> None:
         """
         Plot the accuracy of the model.
 
@@ -387,7 +389,7 @@ class MultilayerPerceptron(object):
                     weights[f"layer_{idx}_{key}"] = value
         return weights
     
-    def set_weights(self, weights: Dict):
+    def set_weights(self, weights: typing.Dict):
         """
         Set the weights of the model.
 
@@ -401,7 +403,7 @@ class MultilayerPerceptron(object):
                     if weight_key in weights:
                         layer.params[key] = weights[weight_key]
     
-    def add(self, layer: Union[Input, Dense, Dropout, BatchNorm, Activ]) -> None:
+    def add(self, layer: typing.Union[Input, Dense, Dropout, BatchNorm, Activ]) -> None:
         """
         Add a layer to the model.
 
@@ -423,7 +425,7 @@ class MultilayerPerceptron(object):
         """
         return self.predict(x, predict_probs)
     
-    def conditional_tqdm(self, iterable: range, use_progress_bar: bool=False) -> Generator[int, None, None]:
+    def conditional_tqdm(self, iterable: range, use_progress_bar: bool=False) -> typing.Generator[int, None, None]:
         """
         Determine whether to use tqdm or not based on the use_progress_bar flag.
 

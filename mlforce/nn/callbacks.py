@@ -1,12 +1,13 @@
+import typing
+
 import numpy as np
-from typing import Callable, Literal, Tuple
 
 class EarlyStopping(object):
     """
     EarlyStopping class is used to stop training when a monitored metric has stopped improving.
     """
-    def __init__(self, criterion: Callable[[np.ndarray, np.ndarray], float], min_delta: float=0.0, patience: int=5, 
-                 mode: Literal['min', 'max']='min', restore_best_weights: bool=False, start_from_epoch: int=0) -> None:
+    def __init__(self, criterion: typing.Callable[[np.ndarray, np.ndarray], float], min_delta: float=0.0, patience: int=5, 
+                 mode: typing.Literal['min', 'max']='min', restore_best_weights: bool=False, start_from_epoch: int=0) -> None:
         """
         Initialize EarlyStopping object.
 
@@ -53,7 +54,7 @@ class EarlyStopping(object):
         elif self.mode == 'max':
             return curr_value > self.prev_value + self.min_delta
     
-    def __call__(self, y_val: np.ndarray, y_pred: np.ndarray) -> Tuple[bool, bool]:
+    def __call__(self, y_val: np.ndarray, y_pred: np.ndarray) -> typing.Tuple[bool, bool]:
         """
         Update EarlyStopping object and check if training should be stopped.
 

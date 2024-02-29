@@ -1,11 +1,14 @@
 from setuptools import setup, find_packages
+import mlforce
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+VERSION = mlforce.__version__
+
 setup(
     name="mlforce",
-    version="1.0.0",
+    version=VERSION,
     author="Jiarui Xu",
     author_email="xujiarui98@foxmail.com",
     description="Easy-to-use machine learning toolkit for beginners",
@@ -23,5 +26,9 @@ setup(
         "numpy",
         "pandas",
         "scipy",
+        "matplotlib",
+        "scikit-learn",
+        "tqdm",
+        "joblib",
     ],
 )

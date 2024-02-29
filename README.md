@@ -1,4 +1,4 @@
-English | [简体中文](README.zh-CN.md)
+English | [简体中文](https://github.com/XavierSpycy/MLForce/blob/main/README.zh-CN.md)
 
 # Machine Learning Force
 ![PyPI](https://img.shields.io/pypi/v/mlforce)
@@ -30,7 +30,7 @@ Since this module does not have a separate repository, detailed usage instructio
 
 ### `mf` module:
 
-The `mf `in our module stands for `matrix factorization`, a type of dimensionality reduction operation. Currently, this module exclusively includes **`Non-negative Matrix Factorization` implemented using NumPy**.
+The `mf` in our module stands for `matrix factorization`, a type of dimensionality reduction operation. Currently, this module exclusively includes **`Non-negative Matrix Factorization` implemented using NumPy**.
 
 Non-negative Matrix Factorization (NMF) achieves dimensionality reduction by representing the original matrix ($m \times n$) through two lower-rank matrices ($m \times k$ and $k \times n$, where $k << m, n$), providing sparser feature representation. NMF is applicable in areas such as image reconstruction and topic modeling. In our original task, we successfully used NMF to reconstruct a series of noise-affected facial images, yielding significant results.
 
@@ -138,7 +138,7 @@ Contributions are welcome! If you encounter any issues or have suggestions for i
 - MIT License
 
 ## Version History
-- v1.0.0 (2024-01-)
+- v1.0.0 (2024-01-08)
   - Structural refactoring of various modules
   - Optimization of the multilayer perceptron module implementation
   - Addition of the non-negative matrix factorization module

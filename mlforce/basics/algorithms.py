@@ -481,13 +481,19 @@ class PRISM(object):
         
     def generate(self, target_class):
         """
+            Generate the rule(s) for the target class
         """
         """
+            为目标类别生成规则
         """
 
         '''
+        Parameter:
+            target_class, corresponds to the target class.
         '''
         '''
+        参数:
+            target_class, 对应目标类别。
         '''
         
         # Reject the unexpected inputs / 拒绝意外输入
